@@ -102,7 +102,7 @@ func isDir(path string) (val bool, err error) {
 
 func getAllSubDirectories(path string) (dirs []string, err error) {
 	if dir, err := isDir(path); err != nil || !dir {
-		return nil, errors.New("Not a directory " + path)
+		return nil, errors.New("Not a directory, " + path + ". " + err.Error())
 	}
 
 	d, err := os.Open(path)
