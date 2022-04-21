@@ -8,10 +8,10 @@
 ### Usage
 
 ```go
-import "github/pkg4go/glob"
+import "github.com/haoxins/glob"
 
 func main() {
-  matches, err = Glob(".", "**/*.yaml")
+  matches, err = glob.Glob(".", "**/*.yaml")
   Expect(err).To(BeNil())
   Expect(len(matches)).To(Equal(1))
   Expect(matches[0]).To(Equal(".github/workflows/test.yaml"))
