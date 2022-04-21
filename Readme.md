@@ -1,9 +1,9 @@
-[![Build status][travis-img]][travis-url]
-[![PkgGoDev](https://pkg.go.dev/badge/pkg4go/glob)](https://pkg.go.dev/pkg4go/glob)
+[![Build Status Badge]][Build Status]
+[![Go Docs Badge]][Go Docs]
 
-### glob
+## Glob
 
-* `glob` for golang, add `**/*` support.
+- __glob__ for Golang, add `**/*` support.
 
 ### Usage
 
@@ -11,14 +11,14 @@
 import "github/pkg4go/glob"
 
 func main() {
-  glob.Glob("rootDir", "**/*.go")
-  // return
-  // matches []string, err error
+  matches, err = Glob(".", "**/*.yaml")
+  Expect(err).To(BeNil())
+  Expect(len(matches)).To(Equal(1))
+  Expect(matches[0]).To(Equal(".github/workflows/test.yaml"))
 }
 ```
 
-### License
-MIT
-
-[travis-img]: https://img.shields.io/travis/pkg4go/glob.svg?style=flat-square
-[travis-url]: https://travis-ci.org/pkg4go/glob
+[Build Status Badge]: https://github.com/haoxins/glob/actions/workflows/test.yaml/badge.svg
+[Build Status]: https://github.com/haoxins/glob/actions/workflows/test.yaml
+[Go Docs Badge]: https://pkg.go.dev/badge/github.com/haoxins/glob
+[Go Docs]: https://pkg.go.dev/github.com/haoxins/glob

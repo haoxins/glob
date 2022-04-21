@@ -1,11 +1,13 @@
 package glob
 
-import "path/filepath"
-import "strings"
-import "errors"
-import "os"
+import (
+	"errors"
+	"os"
+	"path/filepath"
+	"strings"
+)
 
-type matchEntry struct {
+type MatchEntry struct {
 	path  string
 	index int
 }
@@ -17,12 +19,12 @@ func Glob(root string, pattern string) (matches []string, e error) {
 
 	segments := strings.Split(pattern, string(os.PathSeparator))
 
-	workingEntries := []matchEntry{
-		matchEntry{path: root, index: 0},
+	workingEntries := []MatchEntry{
+		{path: root, index: 0},
 	}
 
 	for len(workingEntries) > 0 {
-		var temp []matchEntry
+		var temp []MatchEntry
 		for _, entry := range workingEntries {
 			workingPath := entry.path
 			index := entry.index
@@ -41,7 +43,7 @@ func Glob(root string, pattern string) (matches []string, e error) {
 				for _, name := range subDirectories {
 					path := filepath.Join(workingPath, name)
 
-					newEntry := matchEntry{
+					newEntry := MatchEntry{
 						path:  path,
 						index: index,
 					}
@@ -62,7 +64,7 @@ func Glob(root string, pattern string) (matches []string, e error) {
 
 				for _, result := range results {
 					if index+1 < len(segments) {
-						newEntry := matchEntry{
+						newEntry := MatchEntry{
 							path:  result,
 							index: index + 1,
 						}

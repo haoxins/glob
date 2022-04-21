@@ -1,54 +1,56 @@
 package glob
 
-import "os/exec"
-import "testing"
+import (
+	"fmt"
+	"os/exec"
+	"testing"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+)
 
 func TestGlob(t *testing.T) {
-	Run("mkdir", "-p", "temp/a/b/c", "temp/b/c/d")
-	Run("touch", "temp/a/a.go", "temp/a/b/b.go", "temp/a/b/c/c.go")
-	Run("touch", "temp/b/b.go", "temp/b/c/c.go", "temp/b/c/d/d.go")
+	RegisterFailHandler(Fail)
 
-	matches, err := Glob(".", "**/*.go")
-	ifError(t, err)
-	shouldEqual(t, len(matches) == 8, "matches length is incorrect")
-
-	t.Log(matches)
-
-	Run("rm", "-r", "temp")
-
-	matches, err = Glob(".", "**/*.md")
-	ifError(t, err)
-	shouldEqual(t, len(matches) == 1, "matches length is incorrect")
-	shouldEqual(t, matches[0] == "Readme.md", "matches is incorrect")
-
-	matches, err = Glob(".", "*.md")
-	ifError(t, err)
-	shouldEqual(t, len(matches) == 1, "matches length is incorrect")
-	shouldEqual(t, matches[0] == "Readme.md", "matches is incorrect")
-
-	matches, err = Glob(".", ".*.*")
-	ifError(t, err)
-	shouldEqual(t, len(matches) == 1, "matches length is incorrect")
-	shouldEqual(t, matches[0] == ".travis.yml", "matches is incorrect")
+	RunSpecs(t, "Glob Suite")
 }
 
-func Run(name string, arg ...string) (out string, err error) {
+var _ = Describe("Test Glob", func() {
+	run("mkdir", "-p", "temp/a/b/c", "temp/b/c/d")
+	run("touch", "temp/a/a.go", "temp/a/b/b.go", "temp/a/b/c/c.go")
+	run("touch", "temp/b/b.go", "temp/b/c/c.go", "temp/b/c/d/d.go")
+
+	It("Glob should work", func() {
+		matches, err := Glob(".", "**/*.go")
+		Expect(err).To(BeNil())
+		Expect(len(matches)).To(Equal(8))
+
+		fmt.Println(matches)
+
+		run("rm", "-r", "temp")
+
+		matches, err = Glob(".", "**/*.md")
+		Expect(err).To(BeNil())
+		Expect(len(matches)).To(Equal(1))
+		Expect(matches[0]).To(Equal("Readme.md"))
+
+		matches, err = Glob(".", "*.md")
+		Expect(err).To(BeNil())
+		Expect(len(matches)).To(Equal(1))
+		Expect(matches[0]).To(Equal("Readme.md"))
+
+		matches, err = Glob(".", "**/*.yaml")
+		Expect(err).To(BeNil())
+		Expect(len(matches)).To(Equal(1))
+		Expect(matches[0]).To(Equal(".github/workflows/test.yaml"))
+	})
+})
+
+func run(name string, arg ...string) (out string, err error) {
 	data, err := exec.Command(name, arg...).Output()
 	if err != nil {
 		return err.Error(), err
 	}
 
 	return string(data[:]), nil
-}
-
-func ifError(t *testing.T, err error) {
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
-func shouldEqual(t *testing.T, equal bool, msg string) {
-	if !equal {
-		t.Fatal(msg)
-	}
 }
