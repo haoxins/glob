@@ -2,6 +2,7 @@ package glob
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,16 +32,16 @@ func Glob(root string, pattern string) (matches []string, e error) {
 			segment := segments[entry.index]
 
 			if segment == "**" {
-				// add all subdirectories and move yourself one step further into pattern
+				// Add all sub dirs and move yourself one step further into pattern
 				entry.index++
 
-				subDirectories, err := getAllSubDirectories(entry.path)
+				subDirs, err := getAllSubDirs(entry.path)
 
 				if err != nil {
 					return nil, err
 				}
 
-				for _, name := range subDirectories {
+				for _, name := range subDirs {
 					path := filepath.Join(workingPath, name)
 
 					newEntry := MatchEntry{
@@ -53,7 +54,8 @@ func Glob(root string, pattern string) (matches []string, e error) {
 
 			} else {
 				// look at all results
-				// if we're at the end of the pattern, we found a match
+				// if we're at the end of the pattern,
+				// we found a match
 				// else add it to a working entry
 				path := filepath.Join(workingPath, segment)
 				results, err := filepath.Glob(path)
@@ -90,19 +92,13 @@ func Glob(root string, pattern string) (matches []string, e error) {
 	return
 }
 
-func isDir(path string) (val bool, err error) {
-	fi, err := os.Stat(path)
-
+func getAllSubDirs(path string) (dirs []string, err error) {
+	dir, err := isDir(path)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
-
-	return fi.IsDir(), nil
-}
-
-func getAllSubDirectories(path string) (dirs []string, err error) {
-	if dir, err := isDir(path); err != nil || !dir {
-		return nil, errors.New("Not a directory, " + path + ". " + err.Error())
+	if !dir {
+		return nil, errors.New("Not a directory: " + path)
 	}
 
 	d, err := os.Open(path)
@@ -117,10 +113,25 @@ func getAllSubDirectories(path string) (dirs []string, err error) {
 
 	for _, file := range files {
 		path := filepath.Join(path, file)
-		if dir, err := isDir(path); err == nil && dir {
+		dir, err := isDir(path)
+		if err != nil {
+			fmt.Println("Checking is dir error (" + err.Error() + ") for path: " + path)
+			continue
+		}
+		if dir {
 			dirs = append(dirs, file)
 		}
 	}
 
 	return
+}
+
+func isDir(path string) (val bool, err error) {
+	fi, err := os.Stat(path)
+
+	if err != nil {
+		return false, err
+	}
+
+	return fi.IsDir(), nil
 }
