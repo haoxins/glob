@@ -1,7 +1,6 @@
 package glob
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -98,7 +97,7 @@ func getAllSubDirs(path string) (dirs []string, err error) {
 		return nil, err
 	}
 	if !dir {
-		return nil, errors.New("Not a directory: " + path)
+		return nil, fmt.Errorf("Glob: the path %s is not a dir ", path)
 	}
 
 	d, err := os.Open(path)
@@ -115,7 +114,7 @@ func getAllSubDirs(path string) (dirs []string, err error) {
 		path := filepath.Join(path, file)
 		dir, err := isDir(path)
 		if err != nil {
-			fmt.Println("Checking is dir error (" + err.Error() + ") for path: " + path)
+			fmt.Printf("Glob: checking is dir error (%s) for path %s\n", err.Error(), path)
 			continue
 		}
 		if dir {
